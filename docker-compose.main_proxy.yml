@@ -121,7 +121,7 @@ services:
 
 
   sshproxy_gen:
-    image: egoriv/sshproxy-gen:latest
+    image: ghcr.io/serdcebolit/sshproxy-gen:latest
     container_name: main_sshproxy_gen
     restart: always
     networks:

@@ -2,7 +2,7 @@ version: "3.9"
 services:
   nginx:
     container_name: ${SITE_HOST}_nginx
-    image: egoriv/nginx:latest
+    image: ghcr.io/serdcebolit/nginx:latest
     restart: on-failure
     networks:
       - main_proxy_sandbox_network
@@ -23,7 +23,7 @@ services:
   backend:
     container_name: ${SITE_HOST}_httpd
     hostname: ${SITE_HOST}
-    image: egoriv/httpd:${PHP_VERSION}
+    image: ghcr.io/serdcebolit/httpd:${PHP_VERSION}
     networks:
       - main_proxy_sshproxy
       - default
@@ -48,7 +48,7 @@ services:
 
   mysql:
     container_name: ${SITE_HOST}_mysql
-    image: egoriv/mysql:latest
+    image: ghcr.io/serdcebolit/mysql:latest
     depends_on:
       deploy_manager:
         condition: service_healthy
@@ -90,7 +90,7 @@ services:
 
   deploy_manager:
     container_name: ${SITE_HOST}_deploy_manager
-    image: egoriv/deploy_manager:latest
+    image: ghcr.io/serdcebolit/deploy_manager:latest
     volumes:
       - ./mysql_db_dump:/usr/src/app/db_entrypoint
       - ./www:/usr/src/app/project
@@ -116,7 +116,7 @@ services:
 
   bx_installer:
     container_name: ${SITE_HOST}_bx_installer
-    image: egoriv/bx_installer:latest
+    image: ghcr.io/serdcebolit/bx_installer:latest
     networks:
       - default
     volumes:
