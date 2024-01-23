@@ -14,6 +14,8 @@ RUN wget https://github.com/nginx-proxy/docker-gen/releases/download/0.8.1/docke
 RUN groupadd -g 600 bitrix \
     && useradd -g 600 -u 600 -p bitrix bitrix \
     && mkdir -p /tmp/ && chown -R bitrix:bitrix /tmp \
+    && mkdir -p /etc/ssh \
+    && touch /etc/ssh/ssh_host_rsa_key \
     && chown bitrix:bitrix /etc/ssh/ssh_host_rsa_key
 
 ADD . /usr/src/app
