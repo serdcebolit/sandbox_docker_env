@@ -1,0 +1,142 @@
+version: "3.9"
+services:
+  nginx:
+    build: ./nginx
+    image: egoriv/nginx:latest
+
+  mysql:
+    build: ./mysql
+    image: egoriv/mysql:latest
+
+  deploy_manager:
+    build: ./deploy_manager
+    image: egoriv/deploy_manager:latest
+
+  sshproxy_gen:
+    build: ./sshproxy
+    image: egoriv/sshproxy-gen:latest
+
+  bx_installer:
+    build: ./bx_installer
+    image: egoriv/bx_installer:latest
+
+#образы без xdebug
+  backend70:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 70
+    image: egoriv/httpd:70
+
+  backend71:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 71
+    image: egoriv/httpd:71
+
+  backend72:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 72
+    image: egoriv/httpd:72
+
+  backend73:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 73
+    image: egoriv/httpd:73
+
+  backend74:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 74
+    image: egoriv/httpd:74
+
+  backend80:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 80
+    image: egoriv/httpd:80
+
+  backend81:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 81
+    image: egoriv/httpd:81
+
+  backend82:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 82
+    image: egoriv/httpd:82
+
+  backend83:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 83
+    image: egoriv/httpd:83
+
+#образы с xdebug
+  backend71-xdebug:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 71
+        XDEBUG: php-pecl-xdebug
+    image: egoriv/httpd:71-xdebug
+
+  backend72-xdebug:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 72
+        XDEBUG: php-pecl-xdebug
+    image: egoriv/httpd:72-xdebug
+
+  backend74-xdebug:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 74
+        XDEBUG: php-pecl-xdebug
+    image: egoriv/httpd:74-xdebug
+
+  backend80-xdebug:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 80
+        XDEBUG: php-pecl-xdebug
+    image: egoriv/httpd:80-xdebug
+
+  backend81-xdebug:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 81
+        XDEBUG: php-pecl-xdebug
+    image: egoriv/httpd:81-xdebug
+
+  backend82-xdebug:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 82
+        XDEBUG: php-pecl-xdebug
+    image: egoriv/httpd:82-xdebug
+
+  backend83-xdebug:
+    build:
+      context: ./httpd
+      args:
+        PHP_VERSION: 83
+        XDEBUG: php-pecl-xdebug
+    image: egoriv/httpd:83-xdebug

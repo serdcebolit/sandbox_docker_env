@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  nginx:
+    build: ./nginx
+    ports:
+      - "8080:80"
+  backend:
+    build: ./httpd
+    networks:
+      - main_proxy_sandbox_network
+  mysql:
+    build: ./mysql
+    networks:
+      - main_proxy_sandbox_network
+
+  mail:
+    ports:
+      - "8025:8025"
+
+  bx_installer:
+    build: ./bx_installer
+
+networks:
+  main_proxy_sandbox_network:
+    driver: bridge
+  main_proxy_sshproxy:
+    driver: bridge
+  main_proxy_db_network:
+    driver: bridge

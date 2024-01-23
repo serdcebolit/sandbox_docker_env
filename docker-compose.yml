@@ -1,0 +1,154 @@
+version: "3.9"
+services:
+  nginx:
+    container_name: ${SITE_HOST}_nginx
+    image: egoriv/nginx:latest
+    restart: on-failure
+    networks:
+      - main_proxy_sandbox_network
+      - default
+    depends_on:
+      - backend
+    volumes:
+      - ./www:/home/bitrix/www
+      - ./entrypoints/nginx:/docker-entrypoint.d/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nginx-${SITE_HOST}.rule=Host(`${SITE_HOST}.${MAIN_DOMAIN}`${ADDITIONAL_ROUTES}) || HostRegexp(`{subdomain:.*}.${SITE_HOST}.${MAIN_DOMAIN}`) && !Host(`mail.${SITE_HOST}.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.nginx-${SITE_HOST}.entrypoints=web,websecure"
+      - "traefik.http.routers.nginx-${SITE_HOST}.tls=true"
+      - "traefik.http.routers.nginx-${SITE_HOST}.tls.certresolver=mainresolver"
+      - "traefik.http.routers.nginx-${SITE_HOST}.middlewares=fixHeaders,corsHeaders"
+
+  backend:
+    container_name: ${SITE_HOST}_httpd
+    hostname: ${SITE_HOST}
+    image: egoriv/httpd:${PHP_VERSION}
+    networks:
+      - main_proxy_sshproxy
+      - default
+    restart: on-failure
+    depends_on:
+      mysql:
+        condition: service_started
+      deploy_manager:
+        condition: service_healthy
+    volumes:
+      - ./www:/home/bitrix/www
+      - ./backend_cron:/var/spool/cron
+      - ./ssh_keys:/home/bitrix/.ssh
+      - ./entrypoints/httpd:/docker-entrypoint.d/
+    environment:
+      - SSH_PASSWORD=${SSH_PASSWORD}
+      - SSH_REDIRECT_USER=${SITE_HOST}
+    deploy:
+      resources:
+        limits:
+          memory: ${HTTPD_RAM_LIMIT:-2g}
+
+  mysql:
+    container_name: ${SITE_HOST}_mysql
+    image: egoriv/mysql:latest
+    depends_on:
+      deploy_manager:
+        condition: service_healthy
+    networks:
+      - default
+      - main_proxy_db_network
+    volumes:
+      - mysql_data:/var/lib/mysql:delegated
+      - ./mysql_db_dump:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_USER=${DB_LOGIN}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_ROOT_PASSWORD=SuperSecretRootPASSWORD
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          memory: ${MYSQL_RAM_LIMIT:-2g}
+
+  mail:
+    container_name: ${SITE_HOST}_mail
+    image: mailhog/mailhog:v1.0.1
+    restart: on-failure
+    depends_on:
+      deploy_manager:
+        condition: service_healthy
+    networks:
+      - main_proxy_sandbox_network
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mail-${SITE_HOST}.rule=Host(`mail.${SITE_HOST}.${MAIN_DOMAIN}`)"
+      - "traefik.http.routers.mail-${SITE_HOST}.entrypoints=websecure"
+      - "traefik.http.routers.mail-${SITE_HOST}.middlewares=auth"
+      - "traefik.http.routers.mail-${SITE_HOST}.tls=true"
+      - "traefik.http.routers.mail-${SITE_HOST}.tls.certresolver=mainresolver"
+      - "traefik.http.services.mail-${SITE_HOST}.loadbalancer.server.port=8025"
+
+  deploy_manager:
+    container_name: ${SITE_HOST}_deploy_manager
+    image: egoriv/deploy_manager:latest
+    volumes:
+      - ./mysql_db_dump:/usr/src/app/db_entrypoint
+      - ./www:/usr/src/app/project
+      - ./docker_deploy_manager_id_rsa:/root/.ssh/id_rsa
+      - ./backup_tmp:/usr/src/app/backup_tmp
+    environment:
+      - DOC_ROOT=/usr/src/app
+      - DB_ENTRYPOINT_PATH=/usr/src/app/db_entrypoint
+      - PROJECT_PATH=/usr/src/app/project
+      - NEED_EXEC_MANAGER=${NEED_EXEC_MANAGER}
+      - MODE=${MODE}
+      - BACKUP_LINK=${BACKUP_LINK}
+      - REPO=${REPO}
+      - DB_LOGIN=${DB_LOGIN}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=mysql
+    healthcheck:
+      test: [ "CMD", "bash", "/usr/src/app/healthcheck.sh" ]
+      interval: 10s
+      timeout: 20s
+      retries: 500
+
+  bx_installer:
+    container_name: ${SITE_HOST}_bx_installer
+    image: egoriv/bx_installer:latest
+    networks:
+      - default
+    volumes:
+      - ./www:/usr/src/app/project
+      - ./bx_installer_screenshots:/usr/src/app/bxsetup_lib/screenshots/
+    depends_on:
+      - mysql
+      - backend
+      - nginx
+    environment:
+      - NODE_ENV=production
+      - DB_LOGIN=${DB_LOGIN}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=mysql
+      - NEED_EXEC_MANAGER=${NEED_EXEC_MANAGER}
+      - MODE=${MODE}
+      - PROJECT_PATH=/usr/src/app/project
+      - DOC_ROOT=/usr/src/app
+      - BX_REDACTION=${BX_REDACTION}
+      - BX_ADMIN_PASSWORD=${BX_ADMIN_PASSWORD}
+      - OWNER_EMAIL=${OWNER_EMAIL}
+      - SITE_HOST=${SITE_HOST}
+    restart: "no"
+
+volumes:
+  mysql_data:
+
+networks:
+  main_proxy_sandbox_network:
+    external: true
+  main_proxy_sshproxy:
+    external: true
+  main_proxy_db_network:
+    external: true

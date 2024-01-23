@@ -1,0 +1,11 @@
+[mysqld]
+    max_connections=200
+    innodb_strict_mode=off
+    default-time-zone='+03:00'
+    innodb_use_native_aio=0
+    #log_error=/var/log/mysql/mysql_error.log
+    #innodb_force_recovery=1
+    #innodb_purge_threads=0
+
+
+

@@ -1,0 +1,60 @@
+
+#!/usr/bin/python
+
+import sys
+import os
+import shutil
+
+containers = []
+
+{{ range $host, $containers := groupByMulti $ "Env.SSH_REDIRECT_USER" "," }}
+{{ range $container := $containers }}
+
+{{ $addrLen := len $container.Addresses }}
+
+{{ range $knownNetwork := $container.Networks }}
+    {{ range $containerNetwork := $container.Networks }}
+        {{ if (and (ne $containerNetwork.Name "ingress") (or (eq $knownNetwork.Name $containerNetwork.Name) (eq $knownNetwork.Name "host"))) }}
+            {{/* If only 1 port exposed, use that */}}
+            {{ if hasSuffix "sshproxy" $containerNetwork.Name }}
+
+# {{ $container.Name }}
+containers.append({'user': '{{ $container.Env.SSH_REDIRECT_USER }}', 'address': '{{ $containerNetwork.IP }}'})
+
+
+
+            {{ end }}
+        {{ end }}
+    {{ end }}
+{{ end }}
+
+
+{{ end }}
+{{ end }}
+
+CONFIG_PATH = '/usr/src/app/sshpiper_config'
+if not os.path.exists(CONFIG_PATH):
+    os.mkdir(CONFIG_PATH)
+
+os.chmod(CONFIG_PATH, 0766)
+os.system('chown -R 600:600 ' + CONFIG_PATH)
+
+for container in containers:
+    container_config_path = CONFIG_PATH + '/' + container['user']
+    if not os.path.exists(container_config_path):
+        os.mkdir(container_config_path)
+
+    shutil.copy2('/etc/ssh/ssh_host_rsa_key', container_config_path + '/id_rsa')
+    shutil.copy2('/etc/ssh/ssh_host_rsa_key.pub', container_config_path + '/id_rsa.pub')
+
+    if not os.path.exists(container_config_path + '/authorized_keys'):
+        f = open(container_config_path + '/authorized_keys', 'w')
+        f.close()
+        os.chmod(container_config_path + '/authorized_keys', 0766)
+
+    os.chmod(container_config_path, 0766)
+
+    f = open(container_config_path + '/sshpiper_upstream', 'w')
+    f.write('# httpd\nbitrix@' + container['address'] + ':22')
+    f.close()
+    os.chmod(container_config_path + '/sshpiper_upstream', 0766)

@@ -1,0 +1,14 @@
+{
+  "name": "bitrix-auto-setup",
+  "version": "1.0.0",
+  "description": "Auto install Bitrix Framework with Puppeteer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "egor@intervolga.ru",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^1.20.0"
+  }
+}

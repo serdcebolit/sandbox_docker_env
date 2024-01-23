@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+
+function get_volume_name() {
+    echo "$1" | sed -n "$(($(echo "$1" | grep -n "$2:" | awk -F':' '{print $1}')+1))p" | awk -F': ' '{print $2}'
+}
+
+
+case $1 in
+
+  --help)
+    printf "Usage: sandbox.sh {start|stop|pull|start_local|stop_local|pull_local|build|push} [services...] [options...]\n\n"
+    echo "Command values:"
+    printf "  start_main_proxy                      start main proxy (taefik)\n\n"
+    printf "  stop_main_proxy                       stop main proxy (taefik)\n\n"
+    printf "  start [services...]                   start project. Start all services or specified\n\n"
+    printf "  stop                                  stop project\n\n"
+    printf "  cleanup                               delete db volumes\n\n"
+    printf "  exec [service] [command]              exec command in container\n\n"
+    printf "  pull [services...]                    pull docker images from registry for sandbox env. Pull images for all services or specified\n\n"
+    printf "  start_local [services...]             start project on localhost. Start all services or specified\n\n"
+    printf "  stop_local                            stop project on localhost\n\n"
+    printf "  cleanup_local                         delete db volumes on localhost\n\n"
+    printf "  exec_local [service] [command]        exec command in container on localhost\n\n"
+    printf "  pull_local [services...]              pull docker images from registry for localhost env. Pull images for all services or specified\n\n"
+    printf "  build [services...]                   build all images from docker-compose.build.yml. Build images for all services or specified\n\n"
+    printf "  push [services...]                    push all images from docker-compose.build.yml. Push images for all services or specified\n\n"
+    ;;
+
+  start_main_proxy)
+    docker-compose -f docker-compose.main_proxy.yml -p main_proxy up -d --build
+    ;;
+
+  stop_main_proxy)
+    docker-compose -f docker-compose.main_proxy.yml -p main_proxy down
+    ;;
+
+  start)
+    docker-compose -f docker-compose.yml up -d "${@:2}"
+    ;;
+
+  stop)
+    docker-compose -f docker-compose.yml down
+    ;;
+
+  cleanup)
+    MYSQL_DATA_VOLUME=$(get_volume_name "$(docker-compose -f docker-compose.yml config)" "mysql_data")
+    if [ -n "$MYSQL_DATA_VOLUME" ]; then
+      docker volume rm "$MYSQL_DATA_VOLUME"
+    fi
+    MYSQL_ENTRYPOINT_VOLUME=$(get_volume_name "$(docker-compose -f docker-compose.yml config)" "mysql_db_entrypoint")
+    if [ -n "$MYSQL_ENTRYPOINT_VOLUME" ]; then
+      docker volume rm "$MYSQL_ENTRYPOINT_VOLUME"
+    fi
+    ;;
+
+  exec)
+    docker-compose -f docker-compose.yml exec "${@:2}"
+    ;;
+
+  pull)
+    docker-compose -f docker-compose.yml pull "${@:2}"
+    ;;
+
+  start_local)
+    docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d "${@:2}"
+    echo "Project start on http://127.0.0.1:8080"
+    echo "Mailhog start on http://127.0.0.1:8025"
+    ;;
+
+  stop_local)
+    docker-compose -f docker-compose.yml -f docker-compose.local.yml down
+    ;;
+
+  cleanup_local)
+    MYSQL_DATA_VOLUME=$(get_volume_name "$(docker-compose -f docker-compose.yml -f docker-compose.local.yml config)" "mysql_data")
+    if [ -n "$MYSQL_DATA_VOLUME" ]; then
+      docker volume rm "$MYSQL_DATA_VOLUME"
+    fi
+    MYSQL_ENTRYPOINT_VOLUME=$(get_volume_name "$(docker-compose -f docker-compose.yml -f docker-compose.local.yml config)" "mysql_db_entrypoint")
+    if [ -n "$MYSQL_ENTRYPOINT_VOLUME" ]; then
+      docker volume rm "$MYSQL_ENTRYPOINT_VOLUME"
+    fi
+    ;;
+
+  pull_local)
+    docker-compose -f docker-compose.yml -f docker-compose.local.yml pull "${@:2}"
+    ;;
+
+  build)
+    docker-compose -f docker-compose.build.yml build --parallel "${@:2}"
+    ;;
+
+  push)
+    docker-compose -f docker-compose.build.yml push "${@:2}"
+    ;;
+
+  *)
+    echo "Unknown command"
+    ;;
+  esac

@@ -1,0 +1,11 @@
+/*env
+/.idea
+/www
+/backend_cron
+/backup_tmp
+/mysql_db_dump
+/ssh_keys
+/entrypoints
+/ssh_host_rsa_key
+
+/ext_www
