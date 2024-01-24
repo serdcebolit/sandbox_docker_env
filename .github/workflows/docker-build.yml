@@ -31,3 +31,22 @@ jobs:
       - name: Push containers
         run:
           docker-compose -f docker-compose.build.yml push
+  deploy:
+    name: Деплой на сервер
+    runs-on: ubuntu-latest
+    steps:
+      - name: Пул Докер образов, git pull и перезапуск сервера
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            cd ${{ secrets.DOCKER_ENV_PATH }}
+            zsh sandbox stop
+            git reset --hard
+            git pull
+            docker-compose -f docker-compose.build.yml pull
+            zsh sandbox start
