@@ -12,6 +12,7 @@ on:
       - 'httpd/**'
       - 'adminer/**'
       - 'docker-compose.build.yml'
+      - 'docker-compose.main_proxy.yml'
 
 jobs:
   docker-build:
@@ -37,6 +38,9 @@ jobs:
     steps:
       - name: Пул Докер образов, git pull и перезапуск сервера
         uses: appleboy/ssh-action@v0.1.10
+        env:
+          DEPLOY_ENV_PATH: ${{ secrets.DOCKER_ENV_PATH }}
+          NEED_DEPLOY: ${{ env.NEED_DEPLOY }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -44,9 +48,9 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
           script: |
-            cd ${{ secrets.DOCKER_ENV_PATH }}
+            cd $DEPLOY_ENV_PATH
             zsh sandbox stop
             git reset --hard
             git pull
-            docker-compose -f docker-compose.build.yml pull
+            zsh sandbox pull_proxy
             zsh sandbox start
