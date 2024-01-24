@@ -12,6 +12,7 @@ case $1 in
     echo "Command values:"
     printf "  start_main_proxy                      start main proxy (taefik)\n\n"
     printf "  stop_main_proxy                       stop main proxy (taefik)\n\n"
+    printf "  pull_proxy                            pull docker images from registry for main proxy (taefik) env. Pull images for all services or specified\n\n"
     printf "  start [services...]                   start project. Start all services or specified\n\n"
     printf "  stop                                  stop project\n\n"
     printf "  cleanup                               delete db volumes\n\n"
@@ -33,6 +34,10 @@ case $1 in
   stop_main_proxy)
     docker-compose -f docker-compose.main_proxy.yml -p main_proxy down
     ;;
+
+  pull_proxy)
+      docker-compose -f docker-compose.main_proxy.yml pull
+      ;;
 
   start)
     docker-compose -f docker-compose.yml up -d "${@:2}"
