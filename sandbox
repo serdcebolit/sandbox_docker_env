@@ -27,7 +27,7 @@ case $1 in
     ;;
 
   start_main_proxy)
-    docker-compose -f docker-compose.main_proxy.yml -p main_proxy up -d --build
+    docker-compose -f docker-compose.main_proxy.yml -p main_proxy up -d
     ;;
 
   stop_main_proxy)

@@ -75,8 +75,7 @@ services:
       - "traefik.http.routers.portainer.tls.certresolver=mainresolver"
 
   adminer:
-    build:
-      context: adminer
+    image: ghcr.io/serdcebolit/adminer:latest
     container_name: "adminer"
     restart: always
     networks:

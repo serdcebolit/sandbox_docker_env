@@ -20,6 +20,10 @@ services:
     build: ./bx_installer
     image: ghcr.io/serdcebolit/bx_installer:latest
 
+  adminer:
+    build: ./adminer
+    image: ghcr.io/serdcebolit/adminer:latest
+
 #образы без xdebug
   backend70:
     build:
