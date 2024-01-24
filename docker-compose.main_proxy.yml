@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
 
-# Контейнер для проксирования http запросов и ssh подключений
+  # Контейнер для проксирования http запросов и ssh подключений
   traefik:
     image: "traefik:v2.7"
     container_name: "traefik"
@@ -58,7 +58,7 @@ services:
       - "traefik.http.middlewares.corsHeaders.headers.accesscontrolallowheaders=DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,X-API-KEY,Authorization"
       - "traefik.http.middlewares.allowFrames.headers.customresponseheaders.X-Frame-Options="
 
-# Контейнер для управления и мониторинга докер контейнеров
+  # Контейнер для управления и мониторинга докер контейнеров
   portainer:
     image: cr.portainer.io/portainer/portainer-ce:2.19.2
     container_name: "portainer"
@@ -76,7 +76,7 @@ services:
       - "traefik.http.routers.portainer.tls=true"
       - "traefik.http.routers.portainer.tls.certresolver=mainresolver"
 
-# Контейнер для подключения и управления mysql базами данных песочниц
+  # Контейнер для подключения и управления mysql базами данных песочниц
   adminer:
     image: ghcr.io/serdcebolit/adminer:latest
     container_name: "adminer"
@@ -96,7 +96,7 @@ services:
       - PORTAINER_LOGIN=${PORTAINER_LOGIN}
       - PORTAINER_PASSWORD=${PORTAINER_PASSWORD}
 
-# Контейнер для проксирования ssh подключений
+  # Контейнер для проксирования ssh подключений
   sshproxy:
     image: farmer1992/sshpiperd:v1.0.96
     restart: always
@@ -121,7 +121,7 @@ services:
       - "traefik.tcp.services.sshproxy.loadbalancer.server.port=2222"
 
 
-# Контейнер для генерации ssh ключей и конфигов для sshproxy
+  # Контейнер для генерации ssh ключей и конфигов для sshproxy
   sshproxy_gen:
     image: ghcr.io/serdcebolit/sshproxy-gen:latest
     container_name: main_sshproxy_gen
