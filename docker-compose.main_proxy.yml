@@ -48,8 +48,6 @@ services:
       - "traefik.http.middlewares.secured.chain.middlewares=auth"
       - "traefik.http.routers.dashboard.tls=true"
       - "traefik.http.routers.dashboard.tls.certresolver=mainresolver"
-      # Костыль с volgu.ivsand.ru нужен, чтобы этот сайт открывался и по http и по https
-      - "traefik.http.routers.redirhttps.rule=hostregexp(`{host:.+}`) && !Host(`volgu.${MAIN_DOMAIN}`)" # todo: убрать volgu
       - "traefik.http.routers.redirhttps.entrypoints=web"
       - "traefik.http.routers.redirhttps.middlewares=https-only"
       - "traefik.http.middlewares.fixHeaders.headers.customrequestheaders.HTTPS=YES"
