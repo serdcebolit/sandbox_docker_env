@@ -14,12 +14,6 @@ on:
       - 'docker-compose.build.yml'
       - 'docker-compose.main_proxy.yml'
   workflow_dispatch:
-    inputs:
-      skip_build:
-        description: 'Пропустить сборку и пуш образов'
-        required: false
-        default: false
-        type: boolean
 
 jobs:
   docker-build:
@@ -43,7 +37,6 @@ jobs:
   deploy:
     name: Деплой на сервер
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
     needs: [docker-build]
     steps:
       - name: Пул Докер образов, git pull и перезапуск сервера
