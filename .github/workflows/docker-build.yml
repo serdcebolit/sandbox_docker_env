@@ -43,6 +43,7 @@ jobs:
   deploy:
     name: Деплой на сервер
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     needs: [docker-build]
     steps:
       - name: Пул Докер образов, git pull и перезапуск сервера
