@@ -13,11 +13,19 @@ on:
       - 'adminer/**'
       - 'docker-compose.build.yml'
       - 'docker-compose.main_proxy.yml'
+  workflow_dispatch:
+    inputs:
+      skip_build:
+        description: 'Пропустить сборку и пуш образов'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   docker-build:
     name: Сборка и пуш образов в Github Registry Packages
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' || !github.event.inputs.skip_build
     steps:
       - uses: actions/checkout@v3
       - name: Docker login
