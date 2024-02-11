@@ -53,7 +53,7 @@ jobs:
           script: |
             cd $DEPLOY_ENV_PATH
             bash sandbox stop
-            git reset --hard 
+            su $SSH_MAIN_USER -c 'git reset --hard'
             su $SSH_MAIN_USER -c 'git pull origin master'
             bash sandbox pull_proxy
             bash sandbox start
