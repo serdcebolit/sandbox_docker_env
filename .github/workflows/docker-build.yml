@@ -54,8 +54,8 @@ jobs:
           envs: DEPLOY_ENV_PATH,NEED_DEPLOY,SSH_MAIN_USER
           script: |
             cd $DEPLOY_ENV_PATH
-            bash sandbox stop
+            bash sandbox stop_main_proxy
             su $SSH_MAIN_USER -c 'git reset --hard'
             su $SSH_MAIN_USER -c 'git pull origin master'
             bash sandbox pull_proxy
-            bash sandbox start
+            bash sandbox start_main_proxy
