@@ -7,5 +7,6 @@
 /ssh_keys
 /entrypoints
 /ssh_host_rsa_key
+/portainer_data
 
 /ext_www
