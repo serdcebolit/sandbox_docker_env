@@ -96,7 +96,7 @@ services:
       - PORTAINER_LOGIN=${PORTAINER_LOGIN}
       - PORTAINER_PASSWORD=${PORTAINER_PASSWORD}
 
-  # Контейнер для проксирования ssh подключений
+  # Контейнер для проксирования ssh подключений httpd контейнеров
   sshproxy:
     image: farmer1992/sshpiperd:v1.0.96
     restart: always
