@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build-type xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" uuid="b7c941dd-4316-4c14-b0b0-9351235cf9ff" xsi:noNamespaceSchemaLocation="https://www.jetbrains.com/teamcity/schemas/2021.1/project-config.xsd">
+  <name>Sandbox Docker Manager</name>
+  <description />
+  <settings>
+    <parameters>
+      <param name="SKIP_BUILD" value="false" spec="checkbox label='|0x041f|0x0440|0x043e|0x043f|0x0443|0x0441|0x0442|0x0438|0x0442|0x044c |0x0431|0x0438|0x043b|0x0434 |0x043a|0x043e|0x043d|0x0442|0x0435|0x0439|0x043d|0x0435|0x0440|0x043e|0x0432' uncheckedValue='false' display='prompt' checkedValue='true'" />
+      <param name="env.DEPLOY_ENV_PATH" value="/home/web/sandbox_docker_manager" />
+      <param name="env.SSH_MAIN_USER" value="credentialsJSON:863cc47f-549d-4b5f-bc3c-3aa376c2d690" spec="password display='hidden'" />
+      <param name="env.docker-login" value="credentialsJSON:29b96e4a-727b-4e5d-b564-675a0ddf5747" spec="password display='hidden'" />
+      <param name="env.docker-pass" value="credentialsJSON:dbb6e95c-5d27-43da-a355-a82293a0af70" spec="password display='hidden'" />
+    </parameters>
+    <build-runners>
+      <runner id="Github_Registry_Packages" name="Сборка и пуш образов в Github Registry Packages" type="simpleRunner">
+        <parameters>
+          <param name="script.content"><![CDATA[if [ "%SKIP_BUILD%" != "true" ]; then
+    export COMPOSE_DOCKER_CLI_BUILD=1
+    docker-compose -f docker-compose.build.yml build --no-cache --parallel
+    docker login -u %env.docker-login% -p %env.docker-pass% ghcr.io
+    docker-compose -f docker-compose.build.yml push
+fi]]></param>
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
+      <runner id="ssh_exec_runner" name="Деплой на сервер" type="ssh-exec-runner">
+        <parameters>
+          <param name="jetbrains.buildServer.deployer.targetUrl" value="85.92.108.236" />
+          <param name="jetbrains.buildServer.deployer.username" value="root" />
+          <param name="jetbrains.buildServer.sshexec.authMethod" value="PWD" />
+          <param name="jetbrains.buildServer.sshexec.command"><![CDATA[cd %env.DEPLOY_ENV_PATH%
+docker-compose down
+su %env.SSH_MAIN_USER% -c 'git reset --hard'
+su %env.SSH_MAIN_USER% -c 'git pull origin master'
+docker-compose pull
+docker-compose up -d]]></param>
+          <param name="jetbrains.buildServer.sshexec.port" value="2221" />
+          <param name="secure:jetbrains.buildServer.deployer.password" value="credentialsJSON:6756b0e1-9ee0-4dfa-a99c-bebab2112185" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <vcs-settings>
+      <vcs-entry-ref root-id="SandboxDocker_SandboxDockerManager_HttpsGithubComSerdcebolitSandboxDockerManagerRefsHeadsMaster" />
+    </vcs-settings>
+    <requirements />
+    <build-triggers>
+      <build-trigger id="TRIGGER_2" type="vcsTrigger">
+        <parameters>
+          <param name="branchFilter" value="+:&lt;default&gt;" />
+          <param name="perCheckinTriggering" value="true" />
+          <param name="quietPeriodMode" value="DO_NOT_USE" />
+          <param name="triggerRules"><![CDATA[+:httpd/**
++:node_exec/**
++:docker-compose.build.yml
++:docker-compose.yml]]></param>
+        </parameters>
+      </build-trigger>
+    </build-triggers>
+    <build-extensions>
+      <extension id="perfmon" type="perfmon">
+        <parameters>
+          <param name="teamcity.perfmon.feature.enabled" value="true" />
+        </parameters>
+      </extension>
+    </build-extensions>
+    <cleanup />
+  </settings>
+</build-type>
+
