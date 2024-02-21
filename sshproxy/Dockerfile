@@ -22,4 +22,4 @@ ADD . /usr/src/app
 
 ENV DOCKER_HOST unix:///var/run/docker.sock
 
-CMD docker-gen -interval 10 -watch -notify "python /tmp/register.py" ssproxy.tmpl /tmp/register.py
+CMD docker-gen -interval 10 -watch -notify "su -c 'python /tmp/register.py'" ssproxy.tmpl /tmp/register.py
