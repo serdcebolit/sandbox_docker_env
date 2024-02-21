@@ -1,4 +1,4 @@
-FROM centos:7
+FROM centos:7 as base
 
 ENV TZ="Europe/Moscow"
 
@@ -7,25 +7,27 @@ RUN rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
     rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
     rpm --import http://rpms.famillecollet.com/RPM-GPG-KEY-remi && \
     rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm && \
-    yum update -y && yum install -y vim iproute2 procps-ng net-tools cronie mc git nano htop wget iotop telnet
+    yum update -y && yum install -y vim iproute2 procps-ng net-tools cronie  \
+    mc git nano htop wget iotop telnet sendmail ssmtp mailutils libxml2-dev  \
+    msmtp mysql openssh-server
+
+FROM base as httpd_base
 
 ARG PHP_VERSION
-ARG XDEBUG
 
 RUN yum-config-manager --enable "remi-php$PHP_VERSION" \
     && curl https://packages.microsoft.com/config/rhel/7/prod.repo > /etc/yum.repos.d/mssql-release.repo \
     && ACCEPT_EULA=Y yum install -y \
-    httpd httpd-tools sendmail ssmtp mailutils libxml2-dev msmtp msodbcsql17 mysql \
+    httpd httpd-tools msodbcsql17 \
     php php-cli php-common \
     php-gd php-imap php-json php-ldap \
     php-mbstring php-mysqlnd php-opcache \
     php-pdo php-pear php-pear-DB \
     php-pecl-apcu php-pecl-apcu-bc php-pecl-geoip \
     php-pecl-mcrypt php-pecl-memcache php-pecl-rrd \
-    php-pecl-ssh2 $XDEBUG php-pecl-zip \
-    php-process php-pspell php-xml php-zipstream php-soap php-amqp \
+    php-pecl-ssh2 php-pecl-zip \
+    php-process php-pspell php-xml php-zipstream php-soap php-amqp php-rdkafka \
     php-pecl-imagick php-sqlsrv \
-    openssh-server \
     && yum clean all
 
 
@@ -70,3 +72,7 @@ STOPSIGNAL SIGWINCH
 
 CMD ["httpd", "-DFOREGROUND"]
 ENTRYPOINT ["/usr/bin/bash", "/root/entrypoint.sh"]
+
+FROM httpd_base as httpd_xdebug
+RUN yum update -y && yum install -y php-pecl-xdebug \
+    && yum clean all
