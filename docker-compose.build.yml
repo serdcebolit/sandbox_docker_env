@@ -28,6 +28,7 @@ services:
   backend70:
     build:
       context: ./httpd
+      target: httpd_base
       args:
         PHP_VERSION: 70
     image: ghcr.io/serdcebolit/httpd:70
@@ -35,6 +36,7 @@ services:
   backend71:
     build:
       context: ./httpd
+      target: httpd_base
       args:
         PHP_VERSION: 71
     image: ghcr.io/serdcebolit/httpd:71
@@ -42,6 +44,7 @@ services:
   backend72:
     build:
       context: ./httpd
+      target: httpd_base
       args:
         PHP_VERSION: 72
     image: ghcr.io/serdcebolit/httpd:72
@@ -49,6 +52,7 @@ services:
   backend73:
     build:
       context: ./httpd
+      target: httpd_base
       args:
         PHP_VERSION: 73
     image: ghcr.io/serdcebolit/httpd:73
@@ -56,6 +60,7 @@ services:
   backend74:
     build:
       context: ./httpd
+      target: httpd_base
       args:
         PHP_VERSION: 74
     image: ghcr.io/serdcebolit/httpd:74
@@ -63,6 +68,7 @@ services:
   backend80:
     build:
       context: ./httpd
+      target: httpd_base
       args:
         PHP_VERSION: 80
     image: ghcr.io/serdcebolit/httpd:80
@@ -70,6 +76,7 @@ services:
   backend81:
     build:
       context: ./httpd
+      target: httpd_base
       args:
         PHP_VERSION: 81
     image: ghcr.io/serdcebolit/httpd:81
@@ -77,6 +84,7 @@ services:
   backend82:
     build:
       context: ./httpd
+      target: httpd_base
       args:
         PHP_VERSION: 82
     image: ghcr.io/serdcebolit/httpd:82
@@ -84,6 +92,7 @@ services:
   backend83:
     build:
       context: ./httpd
+      target: httpd_base
       args:
         PHP_VERSION: 83
     image: ghcr.io/serdcebolit/httpd:83
@@ -92,55 +101,55 @@ services:
   backend71-xdebug:
     build:
       context: ./httpd
+      target: httpd_xdebug
       args:
         PHP_VERSION: 71
-        XDEBUG: php-pecl-xdebug
     image: ghcr.io/serdcebolit/httpd:71-xdebug
 
   backend72-xdebug:
     build:
       context: ./httpd
+      target: httpd_xdebug
       args:
         PHP_VERSION: 72
-        XDEBUG: php-pecl-xdebug
     image: ghcr.io/serdcebolit/httpd:72-xdebug
 
   backend74-xdebug:
     build:
       context: ./httpd
+      target: httpd_xdebug
       args:
         PHP_VERSION: 74
-        XDEBUG: php-pecl-xdebug
     image: ghcr.io/serdcebolit/httpd:74-xdebug
 
   backend80-xdebug:
     build:
       context: ./httpd
+      target: httpd_xdebug
       args:
         PHP_VERSION: 80
-        XDEBUG: php-pecl-xdebug
     image: ghcr.io/serdcebolit/httpd:80-xdebug
 
   backend81-xdebug:
     build:
       context: ./httpd
+      target: httpd_xdebug
       args:
         PHP_VERSION: 81
-        XDEBUG: php-pecl-xdebug
     image: ghcr.io/serdcebolit/httpd:81-xdebug
 
   backend82-xdebug:
     build:
       context: ./httpd
+      target: httpd_xdebug
       args:
         PHP_VERSION: 82
-        XDEBUG: php-pecl-xdebug
     image: ghcr.io/serdcebolit/httpd:82-xdebug
 
   backend83-xdebug:
     build:
       context: ./httpd
+      target: httpd_xdebug
       args:
         PHP_VERSION: 83
-        XDEBUG: php-pecl-xdebug
     image: ghcr.io/serdcebolit/httpd:83-xdebug
