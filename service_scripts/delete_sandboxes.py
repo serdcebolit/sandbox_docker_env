@@ -21,7 +21,7 @@ def delete_by_csv(sandboxes_to_delete):
             print('[NOT_DELETED] Песочница {} уже удалена. Папка: {}'.format(row['Домен'], sandbox_path))
 
 spd = pd.read_csv(sandbox_table_path)
-sandboxes_to_delete = spd[spd['Судьба песочницы'] == 'Удалить с ivsand']
+sandboxes_to_delete = spd[spd['Судьба песочницы'] == 'Удалить с сервера']
 print(sandboxes_to_delete.head())
 print(len(sandboxes_to_delete.index))
 delete_by_csv(sandboxes_to_delete)

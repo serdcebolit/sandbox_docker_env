@@ -4,8 +4,8 @@ server {
     server_name _;
 
     # SSL Certificates
-    ssl_certificate     /etc/letsencrypt/live/ivdev.ru/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/ivdev.ru/privkey.pem;
+    ssl_certificate     /etc/letsencrypt/live/serdcebilit.ru/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/serdcebilit.ru/privkey.pem;
 
     server_name_in_redirect	off;
 
