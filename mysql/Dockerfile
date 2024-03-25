@@ -1,4 +1,4 @@
-FROM percona:5.6
+FROM percona:5.7
 
 ENV TZ="Europe/Moscow"
 
